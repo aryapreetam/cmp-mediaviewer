@@ -46,7 +46,7 @@ kotlin {
 }
 
 android {
-  namespace = "io.github.aryapreetam.fiblib"
+  namespace = "io.github.aryapreetam.cmpmediaviewer"
   compileSdk = 35
 
   defaultConfig {
@@ -62,12 +62,12 @@ dependencies {
 //https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-publish-libraries.html
 mavenPublishing {
   publishToMavenCentral()
-  coordinates("io.github.aryapreetam", "fiblib", "0.0.3")
+  coordinates("io.github.aryapreetam", "cmp-mediaviewer", "0.0.1")
 
   pom {
-    name = "Fibonacci Library"
-    description = "Compose Multiplatform library for fibonacci numbers"
-    url = "https://aryapreetam.github.io/cmp-lib-template" //todo
+    name = "Media Viewer for Compose Multiplatform"
+    description = "Media Viewer(Images & Videos) for Compose Multiplatform"
+    url = "https://aryapreetam.github.io/cmp-mediaviewer" //todo
 
     licenses {
       license {
@@ -84,7 +84,7 @@ mavenPublishing {
     }
 
     scm {
-      url = "https://github.com/aryapreetam/cmp-lib-template" //todo
+      url = "https://github.com/aryapreetam/cmp-mediaviewer" //todo
     }
   }
   // Sign publications if either local keyId or CI signingInMemoryKey is available
