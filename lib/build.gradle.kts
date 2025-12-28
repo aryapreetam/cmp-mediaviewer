@@ -40,14 +40,19 @@ kotlin {
     
     // Mediamp for Android, iOS, Desktop (not Wasm)
     jvmMain.dependencies {
+      implementation(libs.ktor.client.java)
       implementation(libs.mediamp.all)
     }
     
     androidMain.dependencies {
+      implementation(libs.ktor.client.okhttp)
+      implementation(libs.media3.exoplayer)
+      implementation(libs.media3.ui)
       implementation(libs.mediamp.all)
     }
     
     iosMain.dependencies {
+      implementation(libs.ktor.client.darwin)
       implementation(libs.mediamp.all)
     }
 
