@@ -28,6 +28,7 @@ import io.github.aryapreetam.cmpmediaviewer.model.MediaViewerConfig
 import io.github.aryapreetam.cmpmediaviewer.ui.CloseButton
 import io.github.aryapreetam.cmpmediaviewer.ui.ImageViewer
 import io.github.aryapreetam.cmpmediaviewer.ui.PositionIndicator
+import io.github.aryapreetam.cmpmediaviewer.ui.VideoViewer
 import kotlinx.coroutines.launch
 
 /**
@@ -138,8 +139,12 @@ public fun MediaViewer(
         when (item.type) {
           MediaType.IMAGE -> ImageViewer(item = item)
           MediaType.VIDEO -> {
-            // TODO: Phase 3 - VideoViewer
-            ImageViewer(item = item) // Placeholder: show poster/thumbnail
+            VideoViewer(
+              item = item,
+              onClose = onDismiss,
+              onPrevious = if (page > 0) {{ coroutineScope.launch { pagerState.animateScrollToPage(page - 1) } }} else null,
+              onNext = if (page < items.lastIndex) {{ coroutineScope.launch { pagerState.animateScrollToPage(page + 1) } }} else null
+            )
           }
         }
       }

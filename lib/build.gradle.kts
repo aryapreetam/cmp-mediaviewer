@@ -37,6 +37,19 @@ kotlin {
       // Zoomable image support
       implementation(libs.zoomimage.compose.coil)
     }
+    
+    // Mediamp for Android, iOS, Desktop (not Wasm)
+    jvmMain.dependencies {
+      implementation(libs.mediamp.all)
+    }
+    
+    androidMain.dependencies {
+      implementation(libs.mediamp.all)
+    }
+    
+    iosMain.dependencies {
+      implementation(libs.mediamp.all)
+    }
 
     commonTest.dependencies {
       implementation(kotlin("test"))

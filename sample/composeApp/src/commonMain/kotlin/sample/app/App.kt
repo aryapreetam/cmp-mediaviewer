@@ -7,6 +7,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,9 +20,10 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import io.github.aryapreetam.cmpmediaviewer.MediaViewer
 import io.github.aryapreetam.cmpmediaviewer.model.MediaItem
+import io.github.aryapreetam.cmpmediaviewer.model.MediaType
 
 /**
- * Sample app demonstrating MediaViewer library usage.
+ * Sample app demonstrating MediaViewer library usage with images and videos.
  */
 @Composable
 fun App() {
@@ -28,13 +31,13 @@ fun App() {
     var showViewer by remember { mutableStateOf(false) }
     var selectedIndex by remember { mutableIntStateOf(0) }
     
-    val mediaItems = remember { getSampleArtworks() }
+    val mediaItems = remember { getSampleMedia() }
     
     Box(modifier = Modifier.fillMaxSize()) {
       // Gallery grid
       GalleryScreen(
         items = mediaItems,
-        onImageClick = { index ->
+        onItemClick = { index ->
           selectedIndex = index
           showViewer = true
         }
@@ -58,7 +61,7 @@ fun App() {
 @Composable
 private fun GalleryScreen(
   items: List<MediaItem>,
-  onImageClick: (Int) -> Unit
+  onItemClick: (Int) -> Unit
 ) {
   Column(
     modifier = Modifier
@@ -70,13 +73,20 @@ private fun GalleryScreen(
       text = "MediaViewer Sample",
       style = MaterialTheme.typography.headlineMedium,
       color = Color.White,
-      modifier = Modifier.padding(bottom = 16.dp)
+      modifier = Modifier.padding(bottom = 8.dp)
     )
     
     Text(
-      text = "Tap any image to open in full-screen viewer. Use arrow keys or swipe to navigate. Press ESC or click X to close.",
+      text = "Images: pinch-to-zoom, double-tap zoom. Videos: tap play button.",
       style = MaterialTheme.typography.bodyMedium,
       color = Color.Gray,
+      modifier = Modifier.padding(bottom = 8.dp)
+    )
+    
+    Text(
+      text = "Note: Desktop video requires VLC Player installed.",
+      style = MaterialTheme.typography.bodySmall,
+      color = Color.Yellow.copy(alpha = 0.7f),
       modifier = Modifier.padding(bottom = 16.dp)
     )
     
@@ -89,7 +99,7 @@ private fun GalleryScreen(
       itemsIndexed(items) { index, item ->
         ThumbnailCard(
           item = item,
-          onClick = { onImageClick(index) }
+          onClick = { onItemClick(index) }
         )
       }
     }
@@ -114,12 +124,54 @@ private fun ThumbnailCard(
       modifier = Modifier.fillMaxSize(),
       contentAlignment = Alignment.Center
     ) {
-      AsyncImage(
-        model = item.thumbnailUrl ?: item.url,
-        contentDescription = item.title,
-        contentScale = ContentScale.Crop,
-        modifier = Modifier.fillMaxSize()
-      )
+      // Thumbnail image (or video poster)
+      val imageUrl = when {
+        item.type == MediaType.VIDEO && item.posterUrl != null -> item.posterUrl
+        item.type == MediaType.VIDEO -> null // Will show play icon
+        else -> item.thumbnailUrl ?: item.url
+      }
+      
+      if (imageUrl != null) {
+        AsyncImage(
+          model = imageUrl,
+          contentDescription = item.title,
+          contentScale = ContentScale.Crop,
+          modifier = Modifier.fillMaxSize()
+        )
+      } else {
+        // Fallback for videos without poster
+        Box(
+          modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF2A2A2A)),
+          contentAlignment = Alignment.Center
+        ) {
+          Icon(
+            imageVector = Icons.Default.PlayArrow,
+            contentDescription = "Video",
+            tint = Color.White,
+            modifier = Modifier.size(48.dp)
+          )
+        }
+      }
+      
+      // Video indicator overlay
+      if (item.type == MediaType.VIDEO) {
+        Box(
+          modifier = Modifier
+            .align(Alignment.Center)
+            .size(40.dp)
+            .background(Color.Black.copy(alpha = 0.6f), RoundedCornerShape(20.dp)),
+          contentAlignment = Alignment.Center
+        ) {
+          Icon(
+            imageVector = Icons.Default.PlayArrow,
+            contentDescription = "Video",
+            tint = Color.White,
+            modifier = Modifier.size(24.dp)
+          )
+        }
+      }
       
       // Title overlay at bottom
       item.title?.let { title ->
@@ -143,9 +195,10 @@ private fun ThumbnailCard(
 }
 
 /**
- * Sample artworks from WikiArt for testing.
+ * Sample media including images and videos.
  */
-private fun getSampleArtworks(): List<MediaItem> = listOf(
+private fun getSampleMedia(): List<MediaItem> = listOf(
+  // Images
   MediaItem.image(
     id = "1",
     url = "https://uploads0.wikiart.org/00475/images/salvador-dali/w1siziisijm4njq3mcjdlfsiccisimnvbnzlcnqilcitcxvhbgl0esa5mcatcmvzaxplidiwmdb4mjawmfx1mdazzsjdxq.jpg",
@@ -166,6 +219,30 @@ private fun getSampleArtworks(): List<MediaItem> = listOf(
     url = "https://uploads8.wikiart.org/00129/images/claude-monet/impression-sunrise.jpg",
     title = "Impression, Sunrise"
   ),
+  
+  // Videos
+  MediaItem.video(
+    id = "v1",
+    url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    title = "Big Buck Bunny"
+  ),
+  MediaItem.video(
+    id = "v2",
+    url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+    title = "Elephants Dream"
+  ),
+  MediaItem.video(
+    id = "v3",
+    url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    title = "For Bigger Blazes"
+  ),
+  MediaItem.video(
+    id = "v4",
+    url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    title = "For Bigger Escapes"
+  ),
+  
+  // More images
   MediaItem.image(
     id = "5",
     url = "https://uploads6.wikiart.org/00142/images/57726d7eedc2cb3880b47e13/the-kiss-gustav-klimt-google-cultural-institute.jpg",
@@ -175,15 +252,5 @@ private fun getSampleArtworks(): List<MediaItem> = listOf(
     id = "6",
     url = "https://uploads1.wikiart.org/images/edvard-munch/the-scream-1893(2).jpg",
     title = "The Scream"
-  ),
-  MediaItem.image(
-    id = "7",
-    url = "https://uploads5.wikiart.org/00129/images/johannes-vermeer/the-girl-with-a-pearl-earring.jpg",
-    title = "Girl with a Pearl Earring"
-  ),
-  MediaItem.image(
-    id = "8",
-    url = "https://uploads1.wikiart.org/00129/images/edward-hopper/nighthawks.jpg",
-    title = "Nighthawks"
   )
 )

@@ -37,6 +37,7 @@ kotlin {
       implementation(compose.ui)
       implementation(compose.foundation)
       implementation(compose.material3)
+      implementation(compose.materialIconsExtended)
       implementation(project(":lib"))
       
       // Coil for image loading in sample
