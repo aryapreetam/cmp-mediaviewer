@@ -36,7 +36,13 @@ kotlin {
       implementation(compose.runtime)
       implementation(compose.ui)
       implementation(compose.foundation)
+      implementation(compose.material3)
       implementation(project(":lib"))
+      
+      // Coil for image loading in sample
+      implementation(libs.coil.compose)
+      implementation(libs.coil.network.ktor)
+      implementation(libs.ktor.client.core)
     }
 
     commonTest.dependencies {
@@ -72,18 +78,17 @@ android {
 
 compose.desktop {
   application {
-    mainClass = "MainKt"
+    mainClass = "sample.app.MainKt"
 
     nativeDistributions {
       targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-      packageName = "sample"
+      packageName = "MediaViewerSample"
       packageVersion = "1.0.0"
     }
   }
 }
 
 tasks.withType<Test>().configureEach {
-  // works for both testDebugUnitTest & testReleaseUnitTest
   if (name.endsWith("UnitTest")) {
     exclude("**/*UITest*")
   }

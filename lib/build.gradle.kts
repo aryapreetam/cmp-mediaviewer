@@ -26,12 +26,20 @@ kotlin {
       implementation(compose.runtime)
       implementation(compose.ui)
       implementation(compose.foundation)
+      implementation(compose.material3)
+      implementation(compose.materialIconsExtended)
+      
+      // Coil for image loading
+      implementation(libs.coil.compose)
+      implementation(libs.coil.network.ktor)
+      implementation(libs.ktor.client.core)
     }
 
     commonTest.dependencies {
       implementation(kotlin("test"))
+      @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+      implementation(compose.uiTest)
     }
-
   }
 
   //https://kotlinlang.org/docs/native-objc-interop.html#export-of-kdoc-comments-to-generated-objective-c-headers
@@ -42,7 +50,6 @@ kotlin {
       }
     }
   }
-
 }
 
 android {
@@ -58,16 +65,14 @@ dependencies {
   dokkaPlugin(libs.android.documentation.plugin)
 }
 
-//Publishing your Kotlin Multiplatform library to Maven Central
-//https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-publish-libraries.html
 mavenPublishing {
   publishToMavenCentral()
   coordinates("io.github.aryapreetam", "cmp-mediaviewer", "0.0.1")
 
   pom {
     name = "Media Viewer for Compose Multiplatform"
-    description = "Media Viewer(Images & Videos) for Compose Multiplatform"
-    url = "https://aryapreetam.github.io/cmp-mediaviewer" //todo
+    description = "Full-screen media viewer (images & videos) for Compose Multiplatform"
+    url = "https://aryapreetam.github.io/cmp-mediaviewer"
 
     licenses {
       license {
@@ -78,16 +83,15 @@ mavenPublishing {
 
     developers {
       developer {
-        id = "aryapreetam" //todo
-        name = "Preetam Bhosle" //todo
+        id = "aryapreetam"
+        name = "Preetam Bhosle"
       }
     }
 
     scm {
-      url = "https://github.com/aryapreetam/cmp-mediaviewer" //todo
+      url = "https://github.com/aryapreetam/cmp-mediaviewer"
     }
   }
-  // Sign publications if either local keyId or CI signingInMemoryKey is available
   if (project.hasProperty("signing.keyId") || project.hasProperty("signingInMemoryKey")) {
     signAllPublications()
   }

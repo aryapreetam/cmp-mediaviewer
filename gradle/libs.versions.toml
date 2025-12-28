@@ -5,13 +5,18 @@ agp = "8.10.0"
 maven-publish = "0.35.0"
 compose = "1.9.0"
 androidx-activityCompose = "1.10.1"
-hot-reload="1.0.0"
+hot-reload = "1.0.0"
 dokka = "2.1.0"
+coil = "3.2.0"
+ktor = "3.1.3"
 
 [libraries]
 android-documentation-plugin = { module = "org.jetbrains.dokka:android-documentation-plugin", version.ref = "dokka" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 
 [plugins]
 
@@ -21,5 +26,5 @@ maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publ
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 android-application = { id = "com.android.application", version.ref = "agp" }
-composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "hot-reload"}
+composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "hot-reload" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
