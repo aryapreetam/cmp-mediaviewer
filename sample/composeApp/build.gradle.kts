@@ -49,6 +49,7 @@ kotlin {
       implementation(libs.kotlin.test)
       @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
       implementation(compose.uiTest)
+      implementation(libs.lifecycle.runtime.compose)
     }
 
     androidMain.dependencies {

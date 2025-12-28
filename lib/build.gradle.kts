@@ -33,6 +33,9 @@ kotlin {
       implementation(libs.coil.compose)
       implementation(libs.coil.network.ktor)
       implementation(libs.ktor.client.core)
+      
+      // Zoomable image support
+      implementation(libs.zoomimage.compose.coil)
     }
 
     commonTest.dependencies {

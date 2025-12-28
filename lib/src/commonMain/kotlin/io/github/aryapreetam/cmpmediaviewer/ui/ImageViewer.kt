@@ -4,15 +4,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import coil3.compose.AsyncImage
-import coil3.compose.LocalPlatformContext
-import coil3.request.ImageRequest
-import coil3.request.crossfade
-import io.github.aryapreetam.cmpmediaviewer.LocalImageLoader
+import com.github.panpf.zoomimage.CoilZoomAsyncImage
+import com.github.panpf.zoomimage.rememberCoilZoomState
 import io.github.aryapreetam.cmpmediaviewer.model.MediaItem
 
 /**
- * Displays a single image with loading/error states.
+ * Displays a single image with zoom and pan support.
+ *
+ * Uses panpf/zoomimage library for gesture handling:
+ * - Pinch to zoom
+ * - Double-tap to toggle zoom (1x ↔ 2x)
+ * - Pan when zoomed
+ * - Rubber band effect at zoom limits
  *
  * @param item The media item to display
  * @param modifier Modifier for the image container
@@ -22,33 +25,14 @@ internal fun ImageViewer(
   item: MediaItem,
   modifier: Modifier = Modifier
 ) {
-  val context = LocalPlatformContext.current
-  val imageLoader = LocalImageLoader.current
+  // Create zoom state - includes double-tap zoom, pinch zoom, pan
+  val zoomState = rememberCoilZoomState()
 
-  val request = ImageRequest.Builder(context)
-    .data(item.url)
-    .crossfade(true)
-    .apply {
-      // Use thumbnail as placeholder if available
-      item.thumbnailUrl?.let { placeholderMemoryCacheKey(it) }
-    }
-    .build()
-
-  if (imageLoader != null) {
-    AsyncImage(
-      model = request,
-      contentDescription = item.title ?: "Media item",
-      imageLoader = imageLoader,
-      contentScale = ContentScale.Fit,
-      modifier = modifier.fillMaxSize()
-    )
-  } else {
-    // Use default singleton image loader
-    AsyncImage(
-      model = request,
-      contentDescription = item.title ?: "Media item",
-      contentScale = ContentScale.Fit,
-      modifier = modifier.fillMaxSize()
-    )
-  }
+  CoilZoomAsyncImage(
+    model = item.url,
+    contentDescription = item.title ?: "Media item",
+    zoomState = zoomState,
+    contentScale = ContentScale.Fit,
+    modifier = modifier.fillMaxSize()
+  )
 }

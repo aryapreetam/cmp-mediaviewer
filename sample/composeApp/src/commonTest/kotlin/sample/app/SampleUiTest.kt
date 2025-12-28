@@ -1,16 +1,32 @@
 package sample.app
 
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.runComposeUiTest
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import io.github.aryapreetam.cmpmediaviewer.MediaViewer
 import io.github.aryapreetam.cmpmediaviewer.TestTags
 import io.github.aryapreetam.cmpmediaviewer.model.MediaItem
 import kotlin.test.Test
 import kotlin.test.assertEquals
+
+/**
+ * Creates a test LifecycleOwner in RESUMED state.
+ */
+private fun createTestLifecycleOwner(): LifecycleOwner {
+  return object : LifecycleOwner {
+    override val lifecycle: Lifecycle = LifecycleRegistry.createUnsafe(this).apply {
+      currentState = Lifecycle.State.RESUMED
+    }
+  }
+}
 
 /**
  * Sample UI tests demonstrating how consumers test MediaViewer in their apps.
@@ -29,10 +45,12 @@ class MediaViewerSampleTest {
   @Test
   fun mediaViewer_displaysCorrectly() = runComposeUiTest {
     setContent {
-      MediaViewer(
-        items = testItems,
-        onDismiss = {}
-      )
+      CompositionLocalProvider(LocalLifecycleOwner provides createTestLifecycleOwner()) {
+        MediaViewer(
+          items = testItems,
+          onDismiss = {}
+        )
+      }
     }
 
     // Verify MediaViewer is displayed
@@ -46,11 +64,13 @@ class MediaViewerSampleTest {
   @Test
   fun mediaViewer_showsCorrectPositionIndicator() = runComposeUiTest {
     setContent {
-      MediaViewer(
-        items = testItems,
-        initialIndex = 0,
-        onDismiss = {}
-      )
+      CompositionLocalProvider(LocalLifecycleOwner provides createTestLifecycleOwner()) {
+        MediaViewer(
+          items = testItems,
+          initialIndex = 0,
+          onDismiss = {}
+        )
+      }
     }
 
     // Position indicator shows "1 of 3" for first item
@@ -61,11 +81,13 @@ class MediaViewerSampleTest {
   @Test
   fun mediaViewer_startsAtInitialIndex() = runComposeUiTest {
     setContent {
-      MediaViewer(
-        items = testItems,
-        initialIndex = 1, // Start at second image
-        onDismiss = {}
-      )
+      CompositionLocalProvider(LocalLifecycleOwner provides createTestLifecycleOwner()) {
+        MediaViewer(
+          items = testItems,
+          initialIndex = 1, // Start at second image
+          onDismiss = {}
+        )
+      }
     }
 
     // Position indicator shows "2 of 3"
@@ -78,10 +100,12 @@ class MediaViewerSampleTest {
     var dismissed = false
     
     setContent {
-      MediaViewer(
-        items = testItems,
-        onDismiss = { dismissed = true }
-      )
+      CompositionLocalProvider(LocalLifecycleOwner provides createTestLifecycleOwner()) {
+        MediaViewer(
+          items = testItems,
+          onDismiss = { dismissed = true }
+        )
+      }
     }
 
     // Click close button
@@ -95,11 +119,13 @@ class MediaViewerSampleTest {
   @Test
   fun mediaViewer_currentItemIsDisplayed() = runComposeUiTest {
     setContent {
-      MediaViewer(
-        items = testItems,
-        initialIndex = 0,
-        onDismiss = {}
-      )
+      CompositionLocalProvider(LocalLifecycleOwner provides createTestLifecycleOwner()) {
+        MediaViewer(
+          items = testItems,
+          initialIndex = 0,
+          onDismiss = {}
+        )
+      }
     }
 
     // First item should be displayed
@@ -110,10 +136,12 @@ class MediaViewerSampleTest {
   @Test
   fun mediaViewer_hidesIndicatorForSingleItem() = runComposeUiTest {
     setContent {
-      MediaViewer(
-        items = listOf(MediaItem.image("1", "https://example.com/single.jpg")),
-        onDismiss = {}
-      )
+      CompositionLocalProvider(LocalLifecycleOwner provides createTestLifecycleOwner()) {
+        MediaViewer(
+          items = listOf(MediaItem.image("1", "https://example.com/single.jpg")),
+          onDismiss = {}
+        )
+      }
     }
 
     // Position indicator should not exist for single item
