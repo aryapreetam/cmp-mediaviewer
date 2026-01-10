@@ -151,7 +151,10 @@ public fun MediaViewer(
     }
 
     // Close button (top-right)
-    if (config.showCloseButton) {
+    // Videos render their own close button inside platform VideoViewer implementations
+    // (to ensure immediate pause/stop on close).
+    val currentItem = items.getOrNull(pagerState.currentPage)
+    if (config.showCloseButton && currentItem?.type != MediaType.VIDEO) {
       CloseButton(
         onClick = onDismiss,
         modifier = Modifier.align(Alignment.TopEnd)

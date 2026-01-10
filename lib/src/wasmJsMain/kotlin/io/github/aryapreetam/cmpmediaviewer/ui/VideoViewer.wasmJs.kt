@@ -11,6 +11,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.WebElementView
+import io.github.aryapreetam.cmpmediaviewer.LocalMediaViewerConfig
 import io.github.aryapreetam.cmpmediaviewer.model.MediaItem
 import kotlinx.browser.document
 import org.w3c.dom.HTMLButtonElement
@@ -30,18 +31,26 @@ internal actual fun VideoViewer(
   onNext: (() -> Unit)?,
   modifier: Modifier
 ) {
+  val config = LocalMediaViewerConfig.current
+
   val containerElement = remember(item.url) {
     createVideoContainer(item.url)
   }
 
   // Set up event listeners
-  DisposableEffect(item.url, onClose, onPrevious, onNext) {
+  DisposableEffect(item.url, config.showCloseButton, item.posterUrl, item.thumbnailUrl, onClose, onPrevious, onNext) {
     val closeBtn = containerElement.querySelector(".close-btn") as? HTMLButtonElement
     val prevBtn = containerElement.querySelector(".prev-btn") as? HTMLButtonElement
     val nextBtn = containerElement.querySelector(".next-btn") as? HTMLButtonElement
     val video = containerElement.querySelector("video") as? HTMLVideoElement
 
-    val closeHandler: (Event) -> Unit = { onClose() }
+    val posterRef = item.posterUrl ?: item.thumbnailUrl
+    video?.poster = posterRef ?: ""
+
+    val closeHandler: (Event) -> Unit = {
+      video?.pause()
+      onClose()
+    }
     val prevHandler: (Event) -> Unit = { 
       video?.pause()
       onPrevious?.invoke() 
@@ -51,13 +60,18 @@ internal actual fun VideoViewer(
       onNext?.invoke() 
     }
 
-    closeBtn?.addEventListener("click", closeHandler)
+    closeBtn?.style?.display = if (config.showCloseButton) "flex" else "none"
+    if (config.showCloseButton) {
+      closeBtn?.addEventListener("click", closeHandler)
+    }
+
+    prevBtn?.style?.display = if (onPrevious != null) "flex" else "none"
     if (onPrevious != null) {
-      prevBtn?.style?.display = "flex"
       prevBtn?.addEventListener("click", prevHandler)
     }
+
+    nextBtn?.style?.display = if (onNext != null) "flex" else "none"
     if (onNext != null) {
-      nextBtn?.style?.display = "flex"
       nextBtn?.addEventListener("click", nextHandler)
     }
 
@@ -97,6 +111,7 @@ private fun createVideoContainer(url: String): HTMLDivElement {
   video.src = url
   video.controls = true
   video.autoplay = false
+  video.preload = "none"
   video.style.maxWidth = "100%"
   video.style.maxHeight = "100%"
   video.style.setProperty("object-fit", "contain")
@@ -118,7 +133,7 @@ private fun createVideoContainer(url: String): HTMLDivElement {
   closeBtn.style.fontSize = "24px"
   closeBtn.style.cursor = "pointer"
   closeBtn.style.zIndex = "10"
-  closeBtn.style.display = "flex"
+  closeBtn.style.display = "none"
   closeBtn.style.alignItems = "center"
   closeBtn.style.justifyContent = "center"
   container.appendChild(closeBtn)

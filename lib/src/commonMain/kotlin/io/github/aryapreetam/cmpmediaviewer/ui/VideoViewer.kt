@@ -9,8 +9,8 @@ import io.github.aryapreetam.cmpmediaviewer.model.MediaItem
  * 
  * Platform implementations:
  * - Desktop (JVM): mediamp with VLC backend
- * - Android: ExoPlayer (TODO)
- * - iOS: AVPlayer (TODO) 
+ * - Android: Media3 ExoPlayer
+ * - iOS: AVPlayer
  * - Wasm: HTML5 video element with HTML-based navigation
  *
  * @param item The video media item to display

@@ -48,6 +48,7 @@ kotlin {
       implementation(libs.ktor.client.okhttp)
       implementation(libs.media3.exoplayer)
       implementation(libs.media3.ui)
+      implementation(libs.lifecycle.runtime.compose)
       implementation(libs.mediamp.all)
     }
     

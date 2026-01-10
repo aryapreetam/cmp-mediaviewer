@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.CircularProgressIndicator
@@ -45,6 +48,7 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.aryapreetam.cmpmediaviewer.LocalMediaViewerConfig
 import io.github.aryapreetam.cmpmediaviewer.TestTags
 import io.github.aryapreetam.cmpmediaviewer.model.MediaItem
 import kotlinx.coroutines.delay
@@ -74,6 +78,7 @@ internal actual fun VideoViewer(
   onNext: (() -> Unit)?,
   modifier: Modifier
 ) {
+  val config = LocalMediaViewerConfig.current
   val player = rememberMediampPlayer()
   val scope = rememberCoroutineScope()
   val focusRequester = remember { FocusRequester() }
@@ -259,6 +264,74 @@ internal actual fun VideoViewer(
             }
           }
         }
+      }
+    }
+
+    // Close button (top-right)
+    if (config.showCloseButton) {
+      IconButton(
+        onClick = {
+          player.pause()
+          onClose()
+        },
+        modifier = Modifier
+          .align(Alignment.TopEnd)
+          .padding(16.dp)
+          .size(48.dp)
+          .clip(CircleShape)
+          .background(Color.Black.copy(alpha = 0.6f))
+      ) {
+        Icon(
+          imageVector = Icons.Default.Close,
+          contentDescription = "Close",
+          tint = Color.White
+        )
+      }
+    }
+
+    // Previous button (left side)
+    if (onPrevious != null) {
+      IconButton(
+        onClick = {
+          player.pause()
+          onPrevious()
+        },
+        modifier = Modifier
+          .align(Alignment.CenterStart)
+          .padding(start = 16.dp)
+          .size(48.dp)
+          .clip(CircleShape)
+          .background(Color.Black.copy(alpha = 0.6f))
+      ) {
+        Icon(
+          imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+          contentDescription = "Previous",
+          tint = Color.White,
+          modifier = Modifier.size(32.dp)
+        )
+      }
+    }
+
+    // Next button (right side)
+    if (onNext != null) {
+      IconButton(
+        onClick = {
+          player.pause()
+          onNext()
+        },
+        modifier = Modifier
+          .align(Alignment.CenterEnd)
+          .padding(end = 16.dp)
+          .size(48.dp)
+          .clip(CircleShape)
+          .background(Color.Black.copy(alpha = 0.6f))
+      ) {
+        Icon(
+          imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+          contentDescription = "Next",
+          tint = Color.White,
+          modifier = Modifier.size(32.dp)
+        )
       }
     }
   }

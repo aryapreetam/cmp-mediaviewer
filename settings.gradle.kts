@@ -36,3 +36,5 @@ plugins {
 include(":lib")
 include(":sample:composeApp")
 
+includeBuild("/Users/preetam/workspace/cmp-videoplayer")
+
