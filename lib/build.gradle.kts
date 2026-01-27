@@ -28,6 +28,9 @@ kotlin {
       implementation(compose.foundation)
       implementation(compose.material3)
       implementation(compose.materialIconsExtended)
+
+      // Video playback
+      implementation("io.github.aryapreetam:cmp-videoplayer:0.0.1")
       
       // Coil for image loading
       implementation(libs.coil.compose)

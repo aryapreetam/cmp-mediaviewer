@@ -34,6 +34,8 @@ import coil3.compose.AsyncImage
 import io.github.aryapreetam.cmpmediaviewer.LocalMediaViewerConfig
 import io.github.aryapreetam.cmpmediaviewer.TestTags
 import io.github.aryapreetam.cmpmediaviewer.model.MediaItem
+import io.github.aryapreetam.cmpvideoplayer.VideoPlayer
+import io.github.aryapreetam.cmpvideoplayer.VideoPlayerConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
@@ -71,11 +73,6 @@ internal actual fun VideoViewer(
   onNext: (() -> Unit)?,
   modifier: Modifier
 ) {
-  // Staff-level defaults (kept local for now; can be lifted to config later)
-  val pauseOnAppBackground = true
-  val enforceSingleActivePlayer = true
-  val pauseOnNavigate = true
-
   val config = LocalMediaViewerConfig.current
 
   val onCloseState by rememberUpdatedState(onClose)
@@ -118,62 +115,6 @@ internal actual fun VideoViewer(
     }
   }
 
-  val playerHolder = remember(item.url) {
-    videoNsUrl?.let { IosPlayerHolder(it) }
-  }
-
-  // Pause & release resources when leaving composition / switching items.
-  DisposableEffect(item.url) {
-    val center = NSNotificationCenter.defaultCenter
-    val holder = playerHolder
-
-    val tokens = buildList {
-      if (pauseOnAppBackground && holder != null) {
-        add(
-          center.addObserverForName(
-            name = UIApplicationWillResignActiveNotification,
-            `object` = null,
-            queue = null
-          ) { _: NSNotification? ->
-            holder.pause()
-          }
-        )
-        add(
-          center.addObserverForName(
-            name = UIApplicationDidEnterBackgroundNotification,
-            `object` = null,
-            queue = null
-          ) { _: NSNotification? ->
-            holder.pause()
-          }
-        )
-      }
-    }
-
-    onDispose {
-      if (ActivePlayerRegistry.activeKey == item.url) {
-        ActivePlayerRegistry.clear()
-      }
-      tokens.forEach(center::removeObserver)
-      holder?.dispose()
-    }
-  }
-
-  // When switching to playing, enforce single-active-player policy + start playback.
-  LaunchedEffect(item.url, isPlaying) {
-    val holder = playerHolder ?: return@LaunchedEffect
-    if (!isPlaying) {
-      holder.pause()
-      return@LaunchedEffect
-    }
-
-    if (enforceSingleActivePlayer && ActivePlayerRegistry.activeKey != item.url) {
-      ActivePlayerRegistry.pauseActive?.invoke()
-    }
-    ActivePlayerRegistry.setActive(item.url) { holder.pause() }
-    holder.play()
-  }
-
   Box(
     modifier = modifier
       .fillMaxSize()
@@ -181,7 +122,7 @@ internal actual fun VideoViewer(
       .testTag(TestTags.VideoControls),
     contentAlignment = Alignment.Center
   ) {
-    if (videoNsUrl == null || playerHolder == null) {
+    if (videoNsUrl == null) {
       // Invalid URL: fail gracefully but keep navigation/close available.
       androidx.compose.material3.Text(
         text = "Unable to load video",
@@ -190,14 +131,10 @@ internal actual fun VideoViewer(
     } else {
       // Poster / player surface
       if (isPlaying) {
-        UIKitView(
-          factory = {
-            playerHolder.ensureView().apply {
-              backgroundColor = UIColor.blackColor
-            }
-          },
+        VideoPlayer(
+          source = item.toVideoSource(),
           modifier = Modifier.fillMaxSize(),
-          update = { /* No-op */ }
+          config = VideoPlayerConfig(autoplay = true)
         )
       } else {
         when {
@@ -252,7 +189,7 @@ internal actual fun VideoViewer(
     if (config.showCloseButton) {
       IconButton(
         onClick = {
-          playerHolder?.pause()
+          isPlaying = false
           onCloseState()
         },
         modifier = Modifier
@@ -274,10 +211,7 @@ internal actual fun VideoViewer(
     if (onPreviousState != null) {
       IconButton(
         onClick = {
-          if (pauseOnNavigate) {
-            isPlaying = false
-            playerHolder?.pause()
-          }
+          isPlaying = false
           onPreviousState?.invoke()
         },
         modifier = Modifier
@@ -300,10 +234,7 @@ internal actual fun VideoViewer(
     if (onNextState != null) {
       IconButton(
         onClick = {
-          if (pauseOnNavigate) {
-            isPlaying = false
-            playerHolder?.pause()
-          }
+          isPlaying = false
           onNextState?.invoke()
         },
         modifier = Modifier

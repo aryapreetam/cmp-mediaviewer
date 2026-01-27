@@ -36,5 +36,9 @@ plugins {
 include(":lib")
 include(":sample:composeApp")
 
-includeBuild("/Users/preetam/workspace/cmp-videoplayer")
+includeBuild("/Users/preetam/workspace/cmp-videoplayer") {
+  dependencySubstitution {
+    substitute(module("io.github.aryapreetam:cmp-videoplayer")).using(project(":lib"))
+  }
+}
 

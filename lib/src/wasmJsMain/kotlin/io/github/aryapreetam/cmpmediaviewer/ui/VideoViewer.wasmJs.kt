@@ -3,25 +3,39 @@ package io.github.aryapreetam.cmpmediaviewer.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.WebElementView
 import io.github.aryapreetam.cmpmediaviewer.LocalMediaViewerConfig
+import io.github.aryapreetam.cmpmediaviewer.TestTags
 import io.github.aryapreetam.cmpmediaviewer.model.MediaItem
+import io.github.aryapreetam.cmpvideoplayer.VideoPlayer
+import io.github.aryapreetam.cmpvideoplayer.VideoPlayerConfig
 import kotlinx.browser.document
-import org.w3c.dom.HTMLButtonElement
-import org.w3c.dom.HTMLDivElement
-import org.w3c.dom.HTMLVideoElement
-import org.w3c.dom.events.Event
+import org.w3c.dom.HTMLImageElement
 
-/**
- * Wasm video viewer using native HTML5 video element with HTML-based navigation controls.
- */
+/** Wasm video viewer delegating playback to `cmp-videoplayer` and keeping viewer chrome here. */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal actual fun VideoViewer(
@@ -32,155 +46,140 @@ internal actual fun VideoViewer(
   modifier: Modifier
 ) {
   val config = LocalMediaViewerConfig.current
-
-  val containerElement = remember(item.url) {
-    createVideoContainer(item.url)
+  var isPlaying by remember(item.url) { mutableStateOf(false) }
+  val posterRef = remember(item.url, item.posterUrl, item.thumbnailUrl) {
+    item.posterUrl ?: item.thumbnailUrl
   }
 
-  // Set up event listeners
-  DisposableEffect(item.url, config.showCloseButton, item.posterUrl, item.thumbnailUrl, onClose, onPrevious, onNext) {
-    val closeBtn = containerElement.querySelector(".close-btn") as? HTMLButtonElement
-    val prevBtn = containerElement.querySelector(".prev-btn") as? HTMLButtonElement
-    val nextBtn = containerElement.querySelector(".next-btn") as? HTMLButtonElement
-    val video = containerElement.querySelector("video") as? HTMLVideoElement
+  val posterElement = remember(posterRef) {
+    posterRef?.let { createPosterElement(it) }
+  }
 
-    val posterRef = item.posterUrl ?: item.thumbnailUrl
-    video?.poster = posterRef ?: ""
-
-    val closeHandler: (Event) -> Unit = {
-      video?.pause()
-      onClose()
-    }
-    val prevHandler: (Event) -> Unit = { 
-      video?.pause()
-      onPrevious?.invoke() 
-    }
-    val nextHandler: (Event) -> Unit = { 
-      video?.pause()
-      onNext?.invoke() 
-    }
-
-    closeBtn?.style?.display = if (config.showCloseButton) "flex" else "none"
-    if (config.showCloseButton) {
-      closeBtn?.addEventListener("click", closeHandler)
-    }
-
-    prevBtn?.style?.display = if (onPrevious != null) "flex" else "none"
-    if (onPrevious != null) {
-      prevBtn?.addEventListener("click", prevHandler)
-    }
-
-    nextBtn?.style?.display = if (onNext != null) "flex" else "none"
-    if (onNext != null) {
-      nextBtn?.addEventListener("click", nextHandler)
-    }
-
+  DisposableEffect(item.url, posterRef) {
     onDispose {
-      video?.pause()
-      video?.src = ""
-      closeBtn?.removeEventListener("click", closeHandler)
-      prevBtn?.removeEventListener("click", prevHandler)
-      nextBtn?.removeEventListener("click", nextHandler)
+      // Best-effort cleanup for the poster element.
+      posterElement?.src = ""
     }
   }
 
   Box(
-    modifier = modifier.fillMaxSize().background(Color.Black),
+    modifier = modifier
+      .fillMaxSize()
+      .background(Color.Black)
+      .testTag(TestTags.VideoControls),
     contentAlignment = Alignment.Center
   ) {
-    WebElementView(
-      factory = { containerElement },
-      modifier = Modifier.fillMaxSize(),
-      update = { /* No updates needed */ }
-    )
+    if (isPlaying) {
+      VideoPlayer(
+        source = item.toVideoSource(),
+        modifier = Modifier.fillMaxSize(),
+        config = VideoPlayerConfig(autoplay = true)
+      )
+    } else {
+      if (posterElement != null) {
+        WebElementView(
+          factory = { posterElement },
+          modifier = Modifier.fillMaxSize(),
+          update = { /* No-op */ }
+        )
+      }
+
+      Box(
+        modifier = Modifier
+          .align(Alignment.Center)
+          .size(80.dp)
+          .clip(CircleShape)
+          .background(Color.Black.copy(alpha = 0.6f))
+          .testTag(TestTags.PlayButton),
+        contentAlignment = Alignment.Center
+      ) {
+        IconButton(
+          onClick = { isPlaying = true },
+          modifier = Modifier.fillMaxSize()
+        ) {
+          Icon(
+            imageVector = Icons.Default.PlayArrow,
+            contentDescription = "Play",
+            tint = Color.White,
+            modifier = Modifier.size(48.dp)
+          )
+        }
+      }
+    }
+
+    if (config.showCloseButton) {
+      IconButton(
+        onClick = {
+          isPlaying = false
+          onClose()
+        },
+        modifier = Modifier
+          .align(Alignment.TopEnd)
+          .padding(16.dp)
+          .size(48.dp)
+          .clip(CircleShape)
+          .background(Color.Black.copy(alpha = 0.6f))
+      ) {
+        Icon(
+          imageVector = Icons.Default.Close,
+          contentDescription = "Close",
+          tint = Color.White
+        )
+      }
+    }
+
+    if (onPrevious != null) {
+      IconButton(
+        onClick = {
+          isPlaying = false
+          onPrevious()
+        },
+        modifier = Modifier
+          .align(Alignment.CenterStart)
+          .padding(start = 16.dp)
+          .size(48.dp)
+          .clip(CircleShape)
+          .background(Color.Black.copy(alpha = 0.6f))
+      ) {
+        Icon(
+          imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+          contentDescription = "Previous",
+          tint = Color.White,
+          modifier = Modifier.size(32.dp)
+        )
+      }
+    }
+
+    if (onNext != null) {
+      IconButton(
+        onClick = {
+          isPlaying = false
+          onNext()
+        },
+        modifier = Modifier
+          .align(Alignment.CenterEnd)
+          .padding(end = 16.dp)
+          .size(48.dp)
+          .clip(CircleShape)
+          .background(Color.Black.copy(alpha = 0.6f))
+      ) {
+        Icon(
+          imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+          contentDescription = "Next",
+          tint = Color.White,
+          modifier = Modifier.size(32.dp)
+        )
+      }
+    }
   }
 }
 
-private fun createVideoContainer(url: String): HTMLDivElement {
-  val container = document.createElement("div") as HTMLDivElement
-  container.style.width = "100%"
-  container.style.height = "100%"
-  container.style.position = "relative"
-  container.style.display = "flex"
-  container.style.alignItems = "center"
-  container.style.justifyContent = "center"
-  container.style.background = "black"
-
-  // Video element with native controls
-  val video = document.createElement("video") as HTMLVideoElement
-  video.src = url
-  video.controls = true
-  video.autoplay = false
-  video.preload = "none"
-  video.style.maxWidth = "100%"
-  video.style.maxHeight = "100%"
-  video.style.setProperty("object-fit", "contain")
-  container.appendChild(video)
-
-  // Close button (top-right)
-  val closeBtn = document.createElement("button") as HTMLButtonElement
-  closeBtn.className = "close-btn"
-  closeBtn.textContent = "\u2715"
-  closeBtn.style.position = "absolute"
-  closeBtn.style.top = "16px"
-  closeBtn.style.right = "16px"
-  closeBtn.style.width = "48px"
-  closeBtn.style.height = "48px"
-  closeBtn.style.borderRadius = "50%"
-  closeBtn.style.border = "none"
-  closeBtn.style.background = "rgba(0, 0, 0, 0.6)"
-  closeBtn.style.color = "white"
-  closeBtn.style.fontSize = "24px"
-  closeBtn.style.cursor = "pointer"
-  closeBtn.style.zIndex = "10"
-  closeBtn.style.display = "none"
-  closeBtn.style.alignItems = "center"
-  closeBtn.style.justifyContent = "center"
-  container.appendChild(closeBtn)
-
-  // Previous button (left side)
-  val prevBtn = document.createElement("button") as HTMLButtonElement
-  prevBtn.className = "prev-btn"
-  prevBtn.textContent = "\u2039"
-  prevBtn.style.position = "absolute"
-  prevBtn.style.left = "16px"
-  prevBtn.style.top = "50%"
-  prevBtn.style.transform = "translateY(-50%)"
-  prevBtn.style.width = "48px"
-  prevBtn.style.height = "48px"
-  prevBtn.style.borderRadius = "50%"
-  prevBtn.style.border = "none"
-  prevBtn.style.background = "rgba(0, 0, 0, 0.6)"
-  prevBtn.style.color = "white"
-  prevBtn.style.fontSize = "32px"
-  prevBtn.style.cursor = "pointer"
-  prevBtn.style.zIndex = "10"
-  prevBtn.style.display = "none"
-  prevBtn.style.alignItems = "center"
-  prevBtn.style.justifyContent = "center"
-  container.appendChild(prevBtn)
-
-  // Next button (right side)
-  val nextBtn = document.createElement("button") as HTMLButtonElement
-  nextBtn.className = "next-btn"
-  nextBtn.textContent = "\u203A"
-  nextBtn.style.position = "absolute"
-  nextBtn.style.right = "16px"
-  nextBtn.style.top = "50%"
-  nextBtn.style.transform = "translateY(-50%)"
-  nextBtn.style.width = "48px"
-  nextBtn.style.height = "48px"
-  nextBtn.style.borderRadius = "50%"
-  nextBtn.style.border = "none"
-  nextBtn.style.background = "rgba(0, 0, 0, 0.6)"
-  nextBtn.style.color = "white"
-  nextBtn.style.fontSize = "32px"
-  nextBtn.style.cursor = "pointer"
-  nextBtn.style.zIndex = "10"
-  nextBtn.style.display = "none"
-  nextBtn.style.alignItems = "center"
-  nextBtn.style.justifyContent = "center"
-  container.appendChild(nextBtn)
-
-  return container
+private fun createPosterElement(url: String): HTMLImageElement {
+  val img = document.createElement("img") as HTMLImageElement
+  img.src = url
+  img.style.width = "100%"
+  img.style.height = "100%"
+  img.style.background = "black"
+  img.style.setProperty("object-fit", "contain")
+  return img
 }
