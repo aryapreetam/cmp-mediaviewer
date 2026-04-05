@@ -10,6 +10,8 @@ pluginManagement {
         includeGroupByRegex("android.*")
       }
     }
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
     gradlePluginPortal()
     mavenCentral()
   }
@@ -25,6 +27,7 @@ dependencyResolutionManagement {
         includeGroupByRegex("android.*")
       }
     }
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     mavenCentral()
   }
 }
@@ -41,4 +44,3 @@ includeBuild("/Users/preetam/workspace/cmp-videoplayer") {
     substitute(module("io.github.aryapreetam:cmp-videoplayer")).using(project(":lib"))
   }
 }
-

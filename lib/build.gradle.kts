@@ -23,11 +23,11 @@ kotlin {
 
   sourceSets {
     commonMain.dependencies {
-      implementation(compose.runtime)
-      implementation(compose.ui)
-      implementation(compose.foundation)
-      implementation(compose.material3)
-      implementation(compose.materialIconsExtended)
+      implementation(libs.compose.runtime)
+      implementation(libs.compose.ui.multiplatform)
+      implementation(libs.compose.foundation)
+      implementation(libs.compose.material3)
+      implementation(libs.compose.materialIconsExtended)
 
       // Video playback
       implementation("io.github.aryapreetam:cmp-videoplayer:0.0.1")
@@ -63,7 +63,7 @@ kotlin {
     commonTest.dependencies {
       implementation(kotlin("test"))
       @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-      implementation(compose.uiTest)
+      implementation(libs.compose.ui.test)
     }
   }
 
