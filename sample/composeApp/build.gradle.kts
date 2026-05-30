@@ -7,13 +7,18 @@ plugins {
   alias(libs.plugins.multiplatform)
   alias(libs.plugins.compose.compiler)
   alias(libs.plugins.compose)
-  alias(libs.plugins.android.application)
+  alias(libs.plugins.android.kotlin.multiplatform.library)
+
 }
 
 kotlin {
   jvmToolchain(17)
 
-  androidTarget()
+  androidLibrary {
+    namespace = "sample.app"
+    compileSdk = 35
+    minSdk = 23
+  }
   jvm()
   wasmJs {
     browser()
@@ -63,27 +68,13 @@ kotlin {
   }
 }
 
-android {
-  namespace = "sample.app"
-  compileSdk = 35
-
-  defaultConfig {
-    minSdk = 21
-    targetSdk = 35
-
-    applicationId = "sample.app"
-    versionCode = 1
-    versionName = "1.0.0"
-  }
-}
-
 compose.desktop {
   application {
     mainClass = "sample.app.MainKt"
 
     nativeDistributions {
-      targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-      packageName = "MediaViewerSample"
+      targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb) // Added TargetFormat.Deb
+      packageName = findProperty("libArtifactId")?.toString()?.let { "sample-$it" } ?: "sample"
       packageVersion = "1.0.0"
     }
   }

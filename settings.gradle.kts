@@ -29,6 +29,7 @@ dependencyResolutionManagement {
     }
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     mavenCentral()
+    mavenLocal()
   }
 }
 
@@ -38,9 +39,11 @@ plugins {
 
 include(":lib")
 include(":sample:composeApp")
+include(":sample:androidApp")
 
-includeBuild("/Users/preetam/workspace/cmp-videoplayer") {
-  dependencySubstitution {
-    substitute(module("io.github.aryapreetam:cmp-videoplayer")).using(project(":lib"))
-  }
-}
+
+// includeBuild("/Users/preetam/workspace/cmp-videoplayer") {
+//   dependencySubstitution {
+//     substitute(module("io.github.aryapreetam:cmp-videoplayer")).using(project(":lib"))
+//   }
+// }
