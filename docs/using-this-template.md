@@ -51,9 +51,9 @@ The script will prompt you for:
 
 **What it does automatically:**
 - ✅ Updates `settings.gradle.kts` with your project name
-- ✅ Updates `lib/build.gradle.kts` with your Maven coordinates, version, and URLs
+- ✅ Updates `cmp-mediaviewer/build.gradle.kts` with your Maven coordinates, version, and URLs
 - ✅ Updates `CONTRIBUTING.md` and `README.MD` with your project info
-- ✅ **Creates your package structure:** `lib/src/commonMain/kotlin/io/github/yourname/yourlibname/`
+- ✅ **Creates your package structure:** `cmp-mediaviewer/src/commonMain/kotlin/io/github/yourname/yourlibname/`
 - ✅ Keeps the `fiblib` example code for reference (delete when ready)
 - ✅ Saves configuration to `.template-config.json` (for re-runs)
 
@@ -108,7 +108,7 @@ After running the setup script:
 
 1. **Your new package structure is ready:**
    ```
-   lib/src/commonMain/kotlin/io/github/yourname/yourlibname/
+   cmp-mediaviewer/src/commonMain/kotlin/io/github/yourname/yourlibname/
    ```
 
 2. **Add your library code** in the new package directory
@@ -117,8 +117,8 @@ After running the setup script:
    - The `fiblib` package is kept as a working reference
    - Delete it when you're ready:
      ```bash
-     rm -rf lib/src/commonMain/kotlin/fiblib
-     rm -rf lib/src/commonTest/kotlin/fiblib
+     rm -rf cmp-mediaviewer/src/commonMain/kotlin/fiblib
+     rm -rf cmp-mediaviewer/src/commonTest/kotlin/fiblib
      ```
 
 4. **Update the sample app** to use your library:
@@ -145,7 +145,7 @@ If you prefer to configure manually without the script:
 rootProject.name = "your-repo-name"
 ```
 
-**In `lib/build.gradle.kts`:**
+**In `cmp-mediaviewer/build.gradle.kts`:**
 ```kotlin
 android {
   namespace = "io.github.yourname.yourlibname"
@@ -178,8 +178,8 @@ mavenPublishing {
 
 Create your package directories:
 ```bash
-mkdir -p lib/src/commonMain/kotlin/io/github/yourname/yourlibname
-mkdir -p lib/src/commonTest/kotlin/io/github/yourname/yourlibname
+mkdir -p cmp-mediaviewer/src/commonMain/kotlin/io/github/yourname/yourlibname
+mkdir -p cmp-mediaviewer/src/commonTest/kotlin/io/github/yourname/yourlibname
 ```
 
 ### 4.3 Update Documentation Files
@@ -308,15 +308,15 @@ Replace repository-specific URLs:
 
 ### 7.1 Remove Template Code
 
-1. Delete `lib/src/commonMain/kotlin/fiblib/Fibonacci.kt`
-2. Delete `lib/src/commonTest/kotlin/fiblib/FibonacciTest.kt`
+1. Delete `cmp-mediaviewer/src/commonMain/kotlin/fibcmp-mediaviewer/Fibonacci.kt`
+2. Delete `cmp-mediaviewer/src/commonTest/kotlin/fibcmp-mediaviewer/FibonacciTest.kt`
 
 ### 7.2 Add Your Code
 
-Create your library files in `lib/src/commonMain/kotlin/yourpackage/`:
+Create your library files in `cmp-mediaviewer/src/commonMain/kotlin/yourpackage/`:
 
 ```kotlin
-// lib/src/commonMain/kotlin/io/github/yourname/yourlibname/YourClass.kt
+// cmp-mediaviewer/src/commonMain/kotlin/io/github/yourname/yourlibname/YourClass.kt
 package io.github.yourname.yourlibname
 
 /**
@@ -329,10 +329,10 @@ fun yourAwesomeFunction(): String {
 
 ### 7.3 Add Tests
 
-Create tests in `lib/src/commonTest/kotlin/yourpackage/`:
+Create tests in `cmp-mediaviewer/src/commonTest/kotlin/yourpackage/`:
 
 ```kotlin
-// lib/src/commonTest/kotlin/io/github/yourname/yourlibname/YourTest.kt
+// cmp-mediaviewer/src/commonTest/kotlin/io/github/yourname/yourlibname/YourTest.kt
 package io.github.yourname.yourlibname
 
 import kotlin.test.Test
@@ -376,9 +376,9 @@ fun App() {
 ./gradlew test
 
 # Test on specific platforms
-./gradlew :lib:jvmTest
-./gradlew :lib:iosSimulatorArm64Test
-./gradlew :lib:wasmJsBrowserTest
+./gradlew :cmp-mediaviewer:jvmTest
+./gradlew :cmp-mediaviewer:iosSimulatorArm64Test
+./gradlew :cmp-mediaviewer:wasmJsBrowserTest
 ```
 
 ### 8.2 Test Sample Apps
@@ -398,7 +398,7 @@ fun App() {
 
 ```bash
 # Publish to Maven Local
-./gradlew :lib:publishToMavenLocal
+./gradlew :cmp-mediaviewer:publishToMavenLocal
 
 # Check it exists
 ls ~/.m2/repository/io/github/yourname/yourlibname/
@@ -454,7 +454,7 @@ Double-check all 5 GitHub secrets are set correctly:
 ### 10.2 Create Release Tag
 
 ```bash
-# Ensure version in lib/build.gradle.kts is correct
+# Ensure version in cmp-mediaviewer/build.gradle.kts is correct
 # coordinates("io.github.yourname", "yourlibname", "0.1.0")
 
 git tag v0.1.0
@@ -514,7 +514,7 @@ Your library is now:
 ## 🔄 For Future Releases
 
 1. Make changes to library code
-2. Update version in `lib/build.gradle.kts`
+2. Update version in `cmp-mediaviewer/build.gradle.kts`
 3. Commit and push
 4. Create and push new tag: `git tag v0.2.0 && git push origin v0.2.0`
 5. Watch the automation work!

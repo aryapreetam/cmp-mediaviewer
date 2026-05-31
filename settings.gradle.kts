@@ -1,4 +1,4 @@
-rootProject.name = "cmp-mediaviewer"
+rootProject.name = "cmp-mediaviewer-root"
 
 pluginManagement {
   repositories {
@@ -37,13 +37,13 @@ plugins {
   id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-include(":lib")
+include(":cmp-mediaviewer")
 include(":sample:composeApp")
 include(":sample:androidApp")
 
 
-// includeBuild("/Users/preetam/workspace/cmp-videoplayer") {
+// includeBuild("../cmp-videoplayer") {
 //   dependencySubstitution {
-//     substitute(module("io.github.aryapreetam:cmp-videoplayer")).using(project(":lib"))
+//     substitute(module("io.github.aryapreetam:cmp-videoplayer")).using(project(":cmp-videoplayer"))
 //   }
 // }

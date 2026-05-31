@@ -42,7 +42,7 @@ kotlin {
       implementation(libs.compose.foundation)
       implementation(libs.compose.material3)
       implementation(libs.compose.materialIconsExtended)
-      implementation(project(":lib"))
+      implementation(project(":cmp-mediaviewer"))
       
       // Coil for image loading in sample
       implementation(libs.coil.compose)
