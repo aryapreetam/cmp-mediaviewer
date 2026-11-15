@@ -9,10 +9,14 @@ class TestTagsTest {
   fun staticTagsHaveExpectedValues() {
     assertEquals("MediaViewer_Root", TestTags.Root)
     assertEquals("MediaViewer_CloseButton", TestTags.CloseButton)
+    assertEquals("MediaViewer_NextButton", TestTags.NextButton)
+    assertEquals("MediaViewer_PreviousButton", TestTags.PreviousButton)
     assertEquals("MediaViewer_Pager", TestTags.Pager)
     assertEquals("MediaViewer_PositionIndicator", TestTags.PositionIndicator)
     assertEquals("MediaViewer_PlayButton", TestTags.PlayButton)
     assertEquals("MediaViewer_VideoControls", TestTags.VideoControls)
+    assertEquals("MediaViewer_VideoError", TestTags.VideoError)
+    assertEquals("MediaViewer_VideoRetryButton", TestTags.VideoRetryButton)
   }
 
   @Test

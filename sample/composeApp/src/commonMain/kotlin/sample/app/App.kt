@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import io.github.aryapreetam.cmpmediaviewer.MediaViewer
@@ -67,6 +68,7 @@ private fun GalleryScreen(
     modifier = Modifier
       .fillMaxSize()
       .background(Color(0xFF121212))
+      .safeDrawingPadding()
       .padding(16.dp)
   ) {
     Text(
@@ -80,25 +82,30 @@ private fun GalleryScreen(
       text = "Images: pinch-to-zoom, double-tap zoom. Videos: tap play button.",
       style = MaterialTheme.typography.bodyMedium,
       color = Color.Gray,
-      modifier = Modifier.padding(bottom = 8.dp)
+      modifier = Modifier.padding(bottom = if (isDesktopPlatform) 8.dp else 16.dp)
     )
     
-    Text(
-      text = "Note: Desktop video requires VLC Player installed.",
-      style = MaterialTheme.typography.bodySmall,
-      color = Color.Yellow.copy(alpha = 0.7f),
-      modifier = Modifier.padding(bottom = 16.dp)
-    )
+    if (isDesktopPlatform) {
+      Text(
+        text = "Note: Desktop video requires VLC Player installed.",
+        style = MaterialTheme.typography.bodySmall,
+        color = Color.Yellow.copy(alpha = 0.7f),
+        modifier = Modifier.padding(bottom = 16.dp)
+      )
+    }
     
     LazyVerticalGrid(
       columns = GridCells.Adaptive(minSize = 150.dp),
       horizontalArrangement = Arrangement.spacedBy(8.dp),
       verticalArrangement = Arrangement.spacedBy(8.dp),
-      modifier = Modifier.fillMaxSize()
+      modifier = Modifier
+        .fillMaxSize()
+        .testTag("gallery_grid")
     ) {
       itemsIndexed(items) { index, item ->
         ThumbnailCard(
           item = item,
+          index = index,
           onClick = { onItemClick(index) }
         )
       }
@@ -109,10 +116,12 @@ private fun GalleryScreen(
 @Composable
 private fun ThumbnailCard(
   item: MediaItem,
+  index: Int,
   onClick: () -> Unit
 ) {
   Card(
     modifier = Modifier
+      .testTag("thumbnail_$index")
       .aspectRatio(1f)
       .clip(RoundedCornerShape(8.dp))
       .clickable(onClick = onClick),
@@ -220,26 +229,26 @@ private fun getSampleMedia(): List<MediaItem> = listOf(
     title = "Impression, Sunrise"
   ),
   
-  // Videos
+  // Videos (3 valid, exactly 1 expired/invalid for error handling)
   MediaItem.video(
     id = "v1",
-    url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    title = "Big Buck Bunny"
+    url = "https://samplelib.com/mp4/sample-5s-360p.mp4",
+    title = "Sample 5s Video"
   ),
   MediaItem.video(
     id = "v2",
-    url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-    title = "Elephants Dream"
+    url = "https://samplelib.com/mp4/sample-10s-360p.mp4",
+    title = "Sample 10s Video"
   ),
   MediaItem.video(
     id = "v3",
-    url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-    title = "For Bigger Blazes"
+    url = "https://samplelib.com/mp4/sample-20s-360p.mp4",
+    title = "Sample 20s Video"
   ),
   MediaItem.video(
     id = "v4",
-    url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-    title = "For Bigger Escapes"
+    url = "https://samplelib.com/mp4/sample-invalid-expired-404.mp4",
+    title = "Expired Video"
   ),
   
   // More images

@@ -14,6 +14,7 @@ class MediaViewerConfigTest {
     
     assertTrue(config.showPositionIndicator)
     assertTrue(config.showCloseButton)
+    assertTrue(config.showNavigationButtons)
     assertTrue(config.enableSwipeNavigation)
     assertTrue(config.enableKeyboardNavigation)
     assertEquals(0.9f, config.backdropAlpha)
@@ -26,6 +27,7 @@ class MediaViewerConfigTest {
     
     assertFalse(config.showPositionIndicator)
     assertFalse(config.showCloseButton)
+    assertFalse(config.showNavigationButtons)
   }
 
   @Test
@@ -41,5 +43,6 @@ class MediaViewerConfigTest {
     assertEquals(3, config.preloadCount)
     // Others should still be default
     assertTrue(config.showCloseButton)
+    assertTrue(config.showNavigationButtons)
   }
 }

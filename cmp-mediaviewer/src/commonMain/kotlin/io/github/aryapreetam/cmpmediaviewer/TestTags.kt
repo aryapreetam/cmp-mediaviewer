@@ -13,6 +13,12 @@ public object TestTags {
   /** Close button positioned at top-right */
   public const val CloseButton: String = "MediaViewer_CloseButton"
 
+  /** Next navigation button positioned at center-right */
+  public const val NextButton: String = "MediaViewer_NextButton"
+
+  /** Previous navigation button positioned at center-left */
+  public const val PreviousButton: String = "MediaViewer_PreviousButton"
+
   /** HorizontalPager for swiping between items */
   public const val Pager: String = "MediaViewer_Pager"
 
@@ -24,6 +30,12 @@ public object TestTags {
 
   /** Video controls container (seek bar, mute, etc.) */
   public const val VideoControls: String = "MediaViewer_VideoControls"
+
+  /** Video error view displayed when playback fails or link is invalid */
+  public const val VideoError: String = "MediaViewer_VideoError"
+
+  /** Retry button inside the video error view */
+  public const val VideoRetryButton: String = "MediaViewer_VideoRetryButton"
 
   /**
    * Returns the test tag for a media item at the given index.

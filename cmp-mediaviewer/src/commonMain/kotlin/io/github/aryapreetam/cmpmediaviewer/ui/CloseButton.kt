@@ -2,6 +2,7 @@ package io.github.aryapreetam.cmpmediaviewer.ui
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
@@ -29,6 +30,7 @@ internal fun CloseButton(
   IconButton(
     onClick = onClick,
     modifier = modifier
+      .statusBarsPadding()
       .padding(16.dp)
       .testTag(TestTags.CloseButton),
     colors = IconButtonDefaults.iconButtonColors(

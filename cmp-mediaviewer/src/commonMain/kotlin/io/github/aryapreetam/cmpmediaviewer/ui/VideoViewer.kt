@@ -25,5 +25,8 @@ internal expect fun VideoViewer(
   onClose: () -> Unit,
   onPrevious: (() -> Unit)?,
   onNext: (() -> Unit)?,
+  currentIndex: Int = 0,
+  totalCount: Int = 0,
+  isSelected: Boolean = true,
   modifier: Modifier = Modifier
 )

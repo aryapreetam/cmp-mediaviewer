@@ -16,7 +16,6 @@ on:
       - 'build.gradle.kts'
       - '.github/workflows/ci.yml'
       - '.github/workflows/push-ci.yml'
-      - 'maestro-e2e/**'
   pull_request:
     paths:
       # Same path filters for PRs
@@ -28,7 +27,6 @@ on:
       - 'build.gradle.kts'
       - '.github/workflows/ci.yml'
       - '.github/workflows/push-ci.yml'
-      - 'maestro-e2e/**'
 
 permissions:
   contents: read

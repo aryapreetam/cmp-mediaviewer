@@ -1,6 +1,6 @@
-# Contributing to Compose Multiplatform Library Template
+# Contributing to CMP Media Viewer
 
-Thank you for your interest in contributing! This document provides guidelines for developers working on this template.
+Thank you for your interest in contributing! This document provides guidelines for developers working on this project.
 
 ---
 
@@ -171,22 +171,22 @@ dependencies {
 
 ### Release Process
 
-1. **Update version in `cmp-mediaviewer/build.gradle.kts`**
-   ```kotlin
-   coordinates("io.github.aryapreetam", "cmp-mediaviewer", "0.0.4") // Bump this
+1. **Update version in `gradle.properties`**
+   ```properties
+   libVersion=0.0.3 // Bump this
    ```
 
 2. **Commit and push**
    ```bash
    git add .
-   git commit -m "Release v0.0.4"
+   git commit -m "Release v0.0.3"
    git push
    ```
 
 3. **Create and push tag**
    ```bash
-   git tag v0.0.4
-   git push origin v0.0.4
+   git tag v0.0.3
+   git push origin v0.0.3
    ```
 
 4. **Monitor GitHub Actions**

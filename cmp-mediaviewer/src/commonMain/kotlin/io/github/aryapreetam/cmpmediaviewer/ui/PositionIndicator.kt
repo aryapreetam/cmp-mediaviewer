@@ -1,6 +1,7 @@
 package io.github.aryapreetam.cmpmediaviewer.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -30,6 +31,7 @@ internal fun PositionIndicator(
     color = Color.White,
     fontSize = 14.sp,
     modifier = modifier
+      .navigationBarsPadding()
       .padding(bottom = 32.dp)
       .background(
         color = Color.Black.copy(alpha = 0.5f),

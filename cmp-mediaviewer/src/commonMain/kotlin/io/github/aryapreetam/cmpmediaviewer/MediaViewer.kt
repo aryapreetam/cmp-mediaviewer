@@ -8,6 +8,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
@@ -27,7 +28,9 @@ import io.github.aryapreetam.cmpmediaviewer.model.MediaType
 import io.github.aryapreetam.cmpmediaviewer.model.MediaViewerConfig
 import io.github.aryapreetam.cmpmediaviewer.ui.CloseButton
 import io.github.aryapreetam.cmpmediaviewer.ui.ImageViewer
+import io.github.aryapreetam.cmpmediaviewer.ui.NextButton
 import io.github.aryapreetam.cmpmediaviewer.ui.PositionIndicator
+import io.github.aryapreetam.cmpmediaviewer.ui.PreviousButton
 import io.github.aryapreetam.cmpmediaviewer.ui.VideoViewer
 import kotlinx.coroutines.launch
 
@@ -67,10 +70,12 @@ public fun MediaViewer(
     return
   }
 
-  val pagerState = rememberPagerState(
-    initialPage = initialIndex.coerceIn(0, items.lastIndex),
-    pageCount = { items.size }
-  )
+  val pagerState = key(initialIndex) {
+    rememberPagerState(
+      initialPage = initialIndex.coerceIn(0, items.lastIndex),
+      pageCount = { items.size }
+    )
+  }
   
   val coroutineScope = rememberCoroutineScope()
   val focusRequester = remember { FocusRequester() }
@@ -124,6 +129,7 @@ public fun MediaViewer(
     // Pager for swiping between items
     HorizontalPager(
       state = pagerState,
+      key = { page -> items[page].id },
       modifier = Modifier
         .fillMaxSize()
         .testTag(TestTags.Pager),
@@ -143,7 +149,10 @@ public fun MediaViewer(
               item = item,
               onClose = onDismiss,
               onPrevious = if (page > 0) {{ coroutineScope.launch { pagerState.animateScrollToPage(page - 1) } }} else null,
-              onNext = if (page < items.lastIndex) {{ coroutineScope.launch { pagerState.animateScrollToPage(page + 1) } }} else null
+              onNext = if (page < items.lastIndex) {{ coroutineScope.launch { pagerState.animateScrollToPage(page + 1) } }} else null,
+              currentIndex = page,
+              totalCount = items.size,
+              isSelected = pagerState.currentPage == page
             )
           }
         }
@@ -151,14 +160,35 @@ public fun MediaViewer(
     }
 
     // Close button (top-right)
-    // Videos render their own close button inside platform VideoViewer implementations
-    // (to ensure immediate pause/stop on close).
-    val currentItem = items.getOrNull(pagerState.currentPage)
-    if (config.showCloseButton && currentItem?.type != MediaType.VIDEO) {
+    if (config.showCloseButton) {
       CloseButton(
         onClick = onDismiss,
         modifier = Modifier.align(Alignment.TopEnd)
       )
+    }
+
+    // Next and Previous navigation buttons
+    if (config.showNavigationButtons && items.size > 1) {
+      if (pagerState.currentPage < items.lastIndex) {
+        NextButton(
+          onClick = {
+            coroutineScope.launch {
+              pagerState.animateScrollToPage(pagerState.currentPage + 1)
+            }
+          },
+          modifier = Modifier.align(Alignment.CenterEnd)
+        )
+      }
+      if (pagerState.currentPage > 0) {
+        PreviousButton(
+          onClick = {
+            coroutineScope.launch {
+              pagerState.animateScrollToPage(pagerState.currentPage - 1)
+            }
+          },
+          modifier = Modifier.align(Alignment.CenterStart)
+        )
+      }
     }
 
     // Position indicator (bottom-center)
