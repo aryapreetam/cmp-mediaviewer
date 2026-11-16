@@ -278,7 +278,8 @@ jobs:
         run: |
           SIMULATOR_ID=$(xcrun simctl list devices available | grep -m1 -Eo '[A-F0-9-]{36}')
           if [ -z "$SIMULATOR_ID" ]; then echo "No available iOS Simulator found!"; exit 1; fi
-          xcodebuild -project sample/iosApp/iosApp.xcodeproj -scheme iosApp -destination "id=$SIMULATOR_ID" -configuration Release build
+          export GRADLE_OPTS="-Dorg.gradle.jvmargs=\"-Xmx6g -XX:+UseParallelGC\""
+          xcodebuild -project sample/iosApp/iosApp.xcodeproj -scheme iosApp -destination "id=$SIMULATOR_ID" -configuration Release ONLY_ACTIVE_ARCH=YES build
           XCODE_IOS_APP=$(find ~/Library/Developer/Xcode/DerivedData/ -type d -path '*/Build/Products/Release-iphonesimulator/*.app' | sort -r | head -n1)
           if [ -d "$XCODE_IOS_APP" ]; then
             APP_DIR=$(dirname "$XCODE_IOS_APP"); APP_NAME=$(basename "$XCODE_IOS_APP")
