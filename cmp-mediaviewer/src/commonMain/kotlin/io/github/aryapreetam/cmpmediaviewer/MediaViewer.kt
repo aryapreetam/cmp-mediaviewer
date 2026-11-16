@@ -8,7 +8,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
@@ -70,12 +69,10 @@ public fun MediaViewer(
     return
   }
 
-  val pagerState = key(initialIndex) {
-    rememberPagerState(
-      initialPage = initialIndex.coerceIn(0, items.lastIndex),
-      pageCount = { items.size }
-    )
-  }
+  val pagerState = rememberPagerState(
+    initialPage = initialIndex.coerceIn(0, items.lastIndex),
+    pageCount = { items.size }
+  )
   
   val coroutineScope = rememberCoroutineScope()
   val focusRequester = remember { FocusRequester() }

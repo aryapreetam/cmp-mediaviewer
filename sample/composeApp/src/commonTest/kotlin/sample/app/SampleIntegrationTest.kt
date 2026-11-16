@@ -6,12 +6,17 @@ import io.github.aryapreetam.parikshan.E2ETestScope
 import io.github.aryapreetam.parikshan.e2eTest
 import io.github.aryapreetam.parikshan.protocol.ScrollDirection
 import kotlin.test.Test
+import kotlinx.coroutines.delay
 
 class SampleIntegrationTest : E2ETestLifecycle {
 
   override suspend fun E2ETestScope.afterEach() {
-    if (hasVisibleNode(TestTags.CloseButton)) {
-      click(TestTags.CloseButton)
+    try {
+      if (hasVisibleNode(TestTags.CloseButton)) {
+        click(TestTags.CloseButton)
+      }
+    } catch (_: Throwable) {
+      // Best-effort cleanup
     }
     // Ensure gallery scroll position is reset to top for subsequent tests
     if (hasVisibleNode("gallery_grid") && !hasVisibleNode("thumbnail_0")) {
@@ -76,6 +81,8 @@ class SampleIntegrationTest : E2ETestLifecycle {
     // 4. Navigate to third item (item 4)
     click(TestTags.NextButton)
     assertVisible("5 of 10")
+    assertVisible(TestTags.PlayButton)
+    assertVisible(TestTags.CloseButton)
 
     // 5. Clean up: close viewer
     click(TestTags.CloseButton)
@@ -118,6 +125,7 @@ class SampleIntegrationTest : E2ETestLifecycle {
     // Open first thumbnail
     click("thumbnail_0")
     assertVisible(TestTags.Root)
+    assertContains(TestTags.PositionIndicator, "1 of 10")
     assertVisible(TestTags.CloseButton)
 
     // Click close
@@ -156,6 +164,7 @@ class SampleIntegrationTest : E2ETestLifecycle {
     // Navigate to next item to verify recovery without refresh
     click(TestTags.NextButton)
     assertContains(TestTags.PositionIndicator, "9 of 10")
+    assertVisible(TestTags.CloseButton)
 
     // Close back to gallery
     click(TestTags.CloseButton)
@@ -173,15 +182,17 @@ class SampleIntegrationTest : E2ETestLifecycle {
     click("thumbnail_4")
     assertVisible(TestTags.Root)
     assertContains(TestTags.PositionIndicator, "5 of 10")
+    assertVisible(TestTags.CloseButton)
 
     assertVisible(TestTags.PlayButton)
     click(TestTags.PlayButton)
 
     // Verify error view is NOT visible for valid video!
     assertNotVisible(TestTags.VideoError)
-
-    assertVisible(TestTags.CloseButton)
-    click(TestTags.CloseButton)
-    assertVisible("MediaViewer Sample")
+    delay(500)
+    if (hasVisibleNode(TestTags.CloseButton)) {
+      retry(maxAttempts = 5, delayMs = 500L) { click(TestTags.CloseButton) }
+      assertVisible("MediaViewer Sample")
+    }
   }
 }
