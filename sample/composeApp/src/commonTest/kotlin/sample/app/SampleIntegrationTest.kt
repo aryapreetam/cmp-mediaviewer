@@ -4,6 +4,7 @@ import io.github.aryapreetam.cmpmediaviewer.TestTags
 import io.github.aryapreetam.parikshan.E2ETestLifecycle
 import io.github.aryapreetam.parikshan.E2ETestScope
 import io.github.aryapreetam.parikshan.e2eTest
+import io.github.aryapreetam.parikshan.protocol.ScrollDirection
 import kotlin.test.Test
 
 class SampleIntegrationTest : E2ETestLifecycle {
@@ -11,6 +12,19 @@ class SampleIntegrationTest : E2ETestLifecycle {
   override suspend fun E2ETestScope.afterEach() {
     if (hasVisibleNode(TestTags.CloseButton)) {
       click(TestTags.CloseButton)
+    }
+    // Ensure gallery scroll position is reset to top for subsequent tests
+    if (hasVisibleNode("gallery_grid") && !hasVisibleNode("thumbnail_0")) {
+      try {
+        scrollUntilVisible(
+          containerTag = "gallery_grid",
+          targetTag = "thumbnail_0",
+          direction = ScrollDirection.Up,
+          maxScrolls = 15
+        )
+      } catch (_: Throwable) {
+        // Best-effort cleanup
+      }
     }
   }
 
@@ -51,6 +65,7 @@ class SampleIntegrationTest : E2ETestLifecycle {
     assertVisible("MediaViewer Sample")
 
     // 2. Open first item (item 2)
+    scrollUntilVisible(containerTag = "gallery_grid", targetTag = "thumbnail_2")
     click("thumbnail_2")
     assertVisible("3 of 10")
 
@@ -62,9 +77,6 @@ class SampleIntegrationTest : E2ETestLifecycle {
     click(TestTags.NextButton)
     assertVisible("5 of 10")
 
-    click(TestTags.PlayButton)
-    // added only for demonstration, we don't need this in real testing
-    kotlinx.coroutines.delay(3000L)
     // 5. Clean up: close viewer
     click(TestTags.CloseButton)
     assertVisible("MediaViewer Sample")

@@ -30,11 +30,11 @@ A full-screen media viewer library for Compose Multiplatform that enables displa
 
 **Key Features:**
 
-- 🖼️ **Image Viewer**: High-quality rendering with smooth pinch-to-zoom and panning gestures.
-- 🎥 **Video Viewer**: Integrated video playback support using native player bindings.
-- 🔁 **Horizontal Pager**: Swipe navigation between multiple media items in a single slideshow/viewer session.
-- 📍 **Position Indicator**: Integrated UI counter to display the current position/page index.
-- ♿ **Keyboard & Gestures**: Close on Escape key press, navigate pages using Left/Right arrow keys on Desktop/Web.
+- 🖼️ **Image Viewer**: Pinch-to-zoom, double-tap zoom, and panning gestures.
+- 🎥 **Video Viewer**: Video playback using platform-native players (Media3/ExoPlayer on Android, AVPlayer on iOS, VLC on Desktop, HTML5 on Web/Wasm).
+- 🔁 **Horizontal Pager**: Swipe navigation between multiple media items in a slideshow/viewer session.
+- 📍 **Position Indicator**: UI counter displaying the current page index and total items.
+- ♿ **Keyboard Navigation**: Close on Escape key press, navigate pages using Left/Right arrow keys on Desktop and Web.
 
 ---
 
@@ -43,10 +43,12 @@ A full-screen media viewer library for Compose Multiplatform that enables displa
 | Capability | Android | iOS | Desktop (JVM) | Web (WASM) |
 |---|---:|---:|---:|---:|
 | Image Viewer | ✅ | ✅ | ✅ | ✅ |
-| Video Viewer | ✅ | ✅ | ✅ | ✅ |
+| Video Viewer | ✅ | ✅ | ✅* | ✅ |
 | Pinch-to-zoom / Pan | ✅ | ✅ | ✅ | ✅ |
 | Swipe Navigation | ✅ | ✅ | ✅ | ✅ |
 | Keyboard Listeners | ❌ | ❌ | ✅ | ✅ |
+
+*\*Desktop video playback relies on native VLC libraries (`libvlc`). Host machines must have VLC Media Player installed (`brew install --cask vlc` on macOS, `sudo apt install vlc libvlc-dev` on Linux). If VLC is not installed, the viewer displays an in-app notice with a retry option.*
 
 Wasm Demo: 
 [![Try Live Demo](https://img.shields.io/badge/Try%20Live%20Demo-Web%20wasmJs-blueviolet?style=for-the-badge)](https://aryapreetam.github.io/cmp-mediaviewer/demo/)

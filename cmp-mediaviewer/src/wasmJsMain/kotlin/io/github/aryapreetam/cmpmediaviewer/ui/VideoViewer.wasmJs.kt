@@ -219,6 +219,7 @@ private fun createWasmVideoContainer(
   onError: (String) -> Unit
 ): HTMLDivElement {
   val container = document.createElement("div") as HTMLDivElement
+  container.id = "MediaViewer_VideoControls"
   container.style.position = "relative"
   container.style.width = "100%"
   container.style.height = "100%"
@@ -258,6 +259,7 @@ private fun createWasmVideoContainer(
 
   // Top-right Close Button (✕)
   val closeButton = document.createElement("button") as HTMLButtonElement
+  closeButton.id = "MediaViewer_CloseButton"
   closeButton.setAttribute("data-testid", "MediaViewer_CloseButton")
   closeButton.setAttribute("aria-label", "Close")
   closeButton.innerHTML = "✕"
@@ -287,6 +289,7 @@ private fun createWasmVideoContainer(
   // Center-left Previous Button (‹)
   if (onPrevious != null) {
     val prevButton = document.createElement("button") as HTMLButtonElement
+    prevButton.id = "MediaViewer_PreviousButton"
     prevButton.setAttribute("data-testid", "MediaViewer_PreviousButton")
     prevButton.setAttribute("aria-label", "Previous")
     prevButton.innerHTML = "‹"
@@ -318,6 +321,7 @@ private fun createWasmVideoContainer(
   // Center-right Next Button (›)
   if (onNext != null) {
     val nextButton = document.createElement("button") as HTMLButtonElement
+    nextButton.id = "MediaViewer_NextButton"
     nextButton.setAttribute("data-testid", "MediaViewer_NextButton")
     nextButton.setAttribute("aria-label", "Next")
     nextButton.innerHTML = "›"
@@ -349,6 +353,7 @@ private fun createWasmVideoContainer(
   // Bottom-center Position Indicator ("X of Y")
   if (totalCount > 1) {
     val positionIndicator = document.createElement("div") as HTMLDivElement
+    positionIndicator.id = "MediaViewer_PositionIndicator"
     positionIndicator.setAttribute("data-testid", "MediaViewer_PositionIndicator")
     positionIndicator.textContent = "${currentIndex + 1} of $totalCount"
     positionIndicator.style.position = "absolute"

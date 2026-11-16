@@ -60,6 +60,34 @@ internal object VlcDiscoveryHelper {
             break
           }
         }
+      } else if (os.contains("linux")) {
+        val linuxCandidates = listOf(
+          File("/usr/lib/x86_64-linux-gnu"),
+          File("/usr/lib/aarch64-linux-gnu"),
+          File("/usr/lib"),
+          File("/usr/local/lib")
+        )
+        for (dir in linuxCandidates) {
+          val vlc = File(dir, "libvlc.so")
+          val vlc5 = File(dir, "libvlc.so.5")
+          if (vlc.exists() || vlc5.exists()) {
+            try {
+              val currentJna = System.getProperty("jna.library.path")
+              val newJna = if (currentJna.isNullOrBlank()) dir.absolutePath else "$currentJna:${dir.absolutePath}"
+              System.setProperty("jna.library.path", newJna)
+              val pluginDir = File(dir, "vlc/plugins").takeIf { it.exists() }
+                ?: File("/usr/lib/vlc/plugins").takeIf { it.exists() }
+              if (pluginDir != null) {
+                uk.co.caprica.vlcj.binding.lib.LibC.INSTANCE.setenv(
+                  "VLC_PLUGIN_PATH",
+                  pluginDir.absolutePath,
+                  1
+                )
+              }
+            } catch (_: Throwable) {}
+            break
+          }
+        }
       }
       val discovery = uk.co.caprica.vlcj.factory.discovery.NativeDiscovery()
       val discovered = discovery.discover()
